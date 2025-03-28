@@ -5,28 +5,33 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 
-SIGMA = 20
+SIGMA = 5
 
 def gauss(x, m, sigma):
     return np.exp(-((x - m) ** 2) / (2 * sigma ** 2))
 
 def rand_x(mx, thrs_x):
-    x = np.random.normal(-300, 300) # x trebuie sa fie tot intre -300 si 300
-    thrs_x = np.random.uniform(0, 1)
-    prob = gauss(x, mx, SIGMA)
-    if prob > thrs_x:
-        return x
+    prob = 1
+    thrs_x = 2
+    while prob < thrs_x:
+        x = np.random.uniform(-300, 300)  # Step 2
+        prob = gauss(x, mx, SIGMA)       # Step 3 
+        thrs_x = int(np.random.uniform(0, 1) * 1000) # Step 4
+        thrs_x = thrs_x/1000
+        print("x", x)
     else:
-        return rand_x(mx, thrs_x)
+        return x
     
 def rand_y(my, thrs_y):
-    y = np.random.normal(-300, 300)
-    thrs_y = np.random.uniform(0, 1)
-    prob = gauss(y, my, SIGMA)
-    if prob > thrs_y:
-        return y
+    prob = 1
+    thrs_y = 2
+    while prob < thrs_y:
+        y = np.random.uniform(-300, 300)
+        thrs_y = int(np.random.uniform(0, 1) * 1000)
+        thrs_y = thrs_y/1000
+        prob = gauss(y, my, SIGMA)
     else:
-        return rand_y(my, thrs_y)
+        return y
 
 def generate_gaussian_dataset(total_points, num_groups, canvas, fig):
     points = []
@@ -37,13 +42,13 @@ def generate_gaussian_dataset(total_points, num_groups, canvas, fig):
         mx = np.random.uniform(-300, 300)
         my = np.random.uniform(-300, 300)
         for _ in range(total_points):
-            thrs_x = np.random.uniform(0, 1)
-            thrs_y = np.random.uniform(0, 1)
+            thrs_x = int(np.random.uniform(0, 1) * 1000)
+            thrs_y = int(np.random.uniform(0, 1) * 1000)
 
-            thrs_x = thrs_x
-            thrs_y = thrs_y
+            thrs_x = thrs_x/1000
+            thrs_y = thrs_y/1000
 
-            print(thrs_x)
+            #print(thrs_x)
             set_x = rand_x(mx, thrs_x)
             set_y = rand_y(my, thrs_y)
 
