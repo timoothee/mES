@@ -45,6 +45,8 @@ class k_medoid():
         with open("Machine_Learn/dataset_choice.txt", "w") as f:
             print("Hello")
 
+        self.dataset = pd.read_csv("Machine_Learn/dataset.txt", sep="\s+", names=["x", "y", "regiunepip3"])
+
         self.ax.scatter(self.dataset["x"], self.dataset["y"], c="blue", s=10, label="Puncte")
 
         self.ax.set_xlabel('X Coordinate')
@@ -137,35 +139,50 @@ class k_medoid():
                 if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
                     tmp_l_x.append(self.dataset["x"][j])
                     tmp_l_y.append(self.dataset["y"][j])
+                    
             temp_grav_x = sum(tmp_l_x)/len(tmp_l_x)
             temp_grav_y = sum(tmp_l_y)/len(tmp_l_y)
 
             closest_value_x = min(tmp_l_x, key=lambda x: abs(x - temp_grav_x))
-            closest_value_y = min(tmp_l_y, key=lambda x: abs(x - temp_grav_y))
-            #print(f"The closest value to target value {temp_grav_x} is {closest_value_x}")
-            #print(f"Group {i}, {tmp_l_x}")
-            #print(f"closest value it is at index {tmp_l_x.index(closest_value_x)}")
+            #closest_value_y = min(tmp_l_y, key=lambda x: abs(x - temp_grav_y))
+            print(f"The closest value to target value {temp_grav_x} is {closest_value_x}")
+            print(f"Group {i}")
+            print(f"closest value it is at index {tmp_l_x.index(closest_value_x)}")
 
-            self.n_center_grav_x.append(closest_value_x)
-            self.n_center_grav_y.append(closest_value_y)
+            tmp_l_x.index(closest_value_x)
+            self.n_center_grav_x.append(tmp_l_x[tmp_l_x.index(closest_value_x)])
+            self.n_center_grav_y.append(tmp_l_y[tmp_l_x.index(closest_value_x)])
             self.ax.scatter(tmp_l_x, tmp_l_y, c=self.colors[i], s=10, label=f"Group {i}")
-            
+
+        print(self.n_center_grav_x, self.n_center_grav_y)    
         self.ax.scatter(self.n_center_grav_x, self.n_center_grav_y, c="red", s=200, marker='x')
 
         print("New center of grav found")
 
         self.dataset_choice.clear()
 
-        for i in range(len(self.dataset)):
-            for j in range(len(self.n_center_grav_x)):
+        for i in range(len(self.dataset)):  # i = 0 --> 10 000
+            for j in range(len(self.n_center_grav_x)): # j = 0 --> kmedoid (ex.7 [max 10])
                 dist = abs(self.n_center_grav_x[j] - self.dataset["x"][i]) + abs(self.n_center_grav_y[j] - self.dataset["y"][i])
                 self.dist_tmp.append(dist)
 
             f_med = self.dist_tmp.index(min(self.dist_tmp))
             self.dataset_choice.append(f_med) # 10000
-            self.dist_tmp.clear()
 
+            self.dist_tmp.clear()
         print("New dist and choice calculated for each point")
+
+        dist_tmp = []
+        dist = 0
+        for i in range(len(self.n_center_grav_x)):   # i = 0 --> 6   (for medoid = 7)
+            for j in range(len(self.dataset_choice)):  # j --> 10 000
+                if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
+                    #print(f"index j = {j}, list n_center_grav = {self.n_center_grav_x}")
+                    dist = abs(self.n_center_grav_x[i] - self.dataset["x"][j]) + abs(self.n_center_grav_y[i] - self.dataset["y"][j])
+                    dist = dist + dist
+            dist_tmp.append(dist)
+        e_cvg = sum(dist_tmp)
+        print("Error cvg calculated")
 
         tmp_l_x = []
         tmp_l_y = []
@@ -184,6 +201,7 @@ class k_medoid():
         self.canvas.draw()
 
         print("Finish")
+        print(f"Error {e_cvg}")
 
     def run_sgui(self):
         generate_k = tk.Button(self.root, text="K Generator", command=self.k_gen)
