@@ -29,6 +29,8 @@ class k_medoid():
         self.dist_tmp = []
         self.dataset_choice = []
 
+        self.colors = ['blue', 'green', 'purple', 'orange', 'cyan', 'magenta', 'yellow', 'black', 'brown', 'red']
+
         self.fig.clf()
         self.ax = self.fig.add_subplot(111)
 
@@ -81,8 +83,6 @@ class k_medoid():
     def group(self):
         dataset_choice = pd.read_csv("Machine_Learn/dataset_choice.txt", sep="\s+", names=["choice"])
 
-        colors = ['blue', 'green', 'purple', 'orange', 'cyan', 'magenta', 'yellow', 'black', 'brown', 'red']
-
         self.fig.clf()
         self.ax = self.fig.add_subplot(111)
         tmp_l_x = []
@@ -95,11 +95,26 @@ class k_medoid():
                 if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
                     tmp_l_x.append(self.dataset["x"][j])
                     tmp_l_y.append(self.dataset["y"][j])
-            self.ax.scatter(tmp_l_x, tmp_l_y, c=colors[i], s=10, label=f"Group {i}")
+            self.ax.scatter(tmp_l_x, tmp_l_y, c=self.colors[i], s=10, label=f"Group {i}")
 
         for i in range(len(self.k_med_x)):
             self.ax.scatter(self.k_med_x[i], self.k_med_y[i], c="red", s=100, marker='x')
 
+        self.canvas.draw()
+
+    def plot_group(self):
+        self.n_center_grav_x = []
+        self.n_center_grav_y = []
+        for i in range(len(self.k_med_x)):   # i = 0 --> 6   (for medoid = 7)
+            tmp_l_x = []
+            tmp_l_y = []
+            for j in range(len(self.dataset_choice)):  # j --> 10 000
+                if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
+                    tmp_l_x.append(self.dataset["x"][j])
+                    tmp_l_y.append(self.dataset["y"][j])
+            self.n_center_grav_x.append(sum(tmp_l_x)/len(tmp_l_x))
+            self.n_center_grav_y.append(sum(tmp_l_y)/len(tmp_l_y))
+            self.ax.scatter(tmp_l_x, tmp_l_y, c=self.colors[i], s=10, label=f"Group {i}")
         self.canvas.draw()
 
     def k_gen(self):
@@ -107,6 +122,68 @@ class k_medoid():
         print(self.k)
 
         self.k_label.config(text=str(self.k))
+
+    def epoch_try(self):
+        print("Epoch")
+        self.fig.clf()
+        self.ax = self.fig.add_subplot(111)
+        self.n_center_grav_x = []
+        self.n_center_grav_y = []
+
+        for i in range(len(self.k_med_x)):   # i = 0 --> 6   (for medoid = 7)
+            tmp_l_x = []
+            tmp_l_y = []
+            for j in range(len(self.dataset_choice)):  # j --> 10 000
+                if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
+                    tmp_l_x.append(self.dataset["x"][j])
+                    tmp_l_y.append(self.dataset["y"][j])
+            temp_grav_x = sum(tmp_l_x)/len(tmp_l_x)
+            temp_grav_y = sum(tmp_l_y)/len(tmp_l_y)
+
+            closest_value_x = min(tmp_l_x, key=lambda x: abs(x - temp_grav_x))
+            closest_value_y = min(tmp_l_y, key=lambda x: abs(x - temp_grav_y))
+            #print(f"The closest value to target value {temp_grav_x} is {closest_value_x}")
+            #print(f"Group {i}, {tmp_l_x}")
+            #print(f"closest value it is at index {tmp_l_x.index(closest_value_x)}")
+
+            self.n_center_grav_x.append(closest_value_x)
+            self.n_center_grav_y.append(closest_value_y)
+            self.ax.scatter(tmp_l_x, tmp_l_y, c=self.colors[i], s=10, label=f"Group {i}")
+            
+        self.ax.scatter(self.n_center_grav_x, self.n_center_grav_y, c="red", s=200, marker='x')
+
+        print("New center of grav found")
+
+        self.dataset_choice.clear()
+
+        for i in range(len(self.dataset)):
+            for j in range(len(self.n_center_grav_x)):
+                dist = abs(self.n_center_grav_x[j] - self.dataset["x"][i]) + abs(self.n_center_grav_y[j] - self.dataset["y"][i])
+                self.dist_tmp.append(dist)
+
+            f_med = self.dist_tmp.index(min(self.dist_tmp))
+            self.dataset_choice.append(f_med) # 10000
+            self.dist_tmp.clear()
+
+        print("New dist and choice calculated for each point")
+
+        tmp_l_x = []
+        tmp_l_y = []
+
+        for i in range(len(self.n_center_grav_x)):   # i = 0 --> 6   (for medoid = 7)
+            tmp_l_x = []
+            tmp_l_y = []
+            for j in range(len(self.dataset_choice)):  # j --> 10 000
+                if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
+                    tmp_l_x.append(self.dataset["x"][j])
+                    tmp_l_y.append(self.dataset["y"][j])
+            self.ax.scatter(tmp_l_x, tmp_l_y, c=self.colors[i], s=10, label=f"Group {i}")
+        
+        self.ax.scatter(self.n_center_grav_x, self.n_center_grav_y, c="red", s=300, marker='x', )
+
+        self.canvas.draw()
+
+        print("Finish")
 
     def run_sgui(self):
         generate_k = tk.Button(self.root, text="K Generator", command=self.k_gen)
@@ -123,6 +200,9 @@ class k_medoid():
 
         an = tk.Button(self.root, text="Regenerate", command=gauss.run_gui)
         an.grid(row=1, column=0, padx=10)
+
+        an2 = tk.Button(self.root, text="Epoch", command=self.epoch_try)
+        an2.grid(row=1, column=1, padx=10)
 
         self.root.mainloop()
 
