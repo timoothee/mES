@@ -7,7 +7,6 @@ import random
 import time
 import f_part as gauss
 class k_medoid():
-
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Gaussian Dataset Generator")
@@ -22,6 +21,7 @@ class k_medoid():
             print("List AVAILABLE")
         except:
             print("List N/A")
+
         self.k = "K = N\A"
 
         self.k_med_x = []
@@ -81,10 +81,7 @@ class k_medoid():
 
         self.canvas.draw()
 
-
     def group(self):
-        dataset_choice = pd.read_csv("Machine_Learn/dataset_choice.txt", sep="\s+", names=["choice"])
-
         self.fig.clf()
         self.ax = self.fig.add_subplot(111)
         tmp_l_x = []
@@ -174,13 +171,14 @@ class k_medoid():
 
         dist_tmp = []
         dist = 0
+        distf = 0
         for i in range(len(self.n_center_grav_x)):   # i = 0 --> 6   (for medoid = 7)
             for j in range(len(self.dataset_choice)):  # j --> 10 000
                 if self.dataset_choice[j] == i:  # if index of 10 000 == k medoid(0--->6)
                     #print(f"index j = {j}, list n_center_grav = {self.n_center_grav_x}")
                     dist = abs(self.n_center_grav_x[i] - self.dataset["x"][j]) + abs(self.n_center_grav_y[i] - self.dataset["y"][j])
-                    dist = dist + dist
-            dist_tmp.append(dist)
+                    distf = distf + dist
+            dist_tmp.append(distf)
         e_cvg = sum(dist_tmp)
         print("Error cvg calculated")
 
