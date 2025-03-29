@@ -17,8 +17,11 @@ class k_medoid():
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.get_tk_widget().grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
-
-        self.dataset = pd.read_csv("dataset.txt", sep="\s+", names=["x", "y", "regiunepip3"])
+        try:
+            self.dataset = pd.read_csv("Machine_Learn/dataset.txt", sep="\s+", names=["x", "y", "regiunepip3"])
+            print("List AVAILABLE")
+        except:
+            print("List N/A")
         self.k = "K = N\A"
 
         self.k_med_x = []
@@ -37,7 +40,7 @@ class k_medoid():
         self.k_med_y.clear()
         self.dataset_choice.clear()
 
-        with open("dataset_choice.txt", "w") as f:
+        with open("Machine_Learn/dataset_choice.txt", "w") as f:
             print("Hello")
 
         self.ax.scatter(self.dataset["x"], self.dataset["y"], c="blue", s=10, label="Puncte")
@@ -68,7 +71,7 @@ class k_medoid():
             self.dataset_choice.append(f_med) # 10000
             self.dist_tmp.clear()
     
-        with open("dataset_choice.txt", "w") as f:
+        with open("Machine_Learn/dataset_choice.txt", "w") as f:
             for k in self.dataset_choice:
                 f.write(f"{k}\n")
 
@@ -76,7 +79,7 @@ class k_medoid():
 
 
     def group(self):
-        dataset_choice = pd.read_csv("dataset_choice.txt", sep="\s+", names=["choice"])
+        dataset_choice = pd.read_csv("Machine_Learn/dataset_choice.txt", sep="\s+", names=["choice"])
 
         colors = ['blue', 'green', 'purple', 'orange', 'cyan', 'magenta', 'yellow', 'black', 'brown', 'red']
 

@@ -62,7 +62,7 @@ def generate_gaussian_dataset(total_points, num_groups, canvas, fig):
             points.append((x, y, i))
 
     # Save points to file
-    with open("dataset.txt", "w") as f:
+    with open("Machine_Learn/dataset.txt", "w") as f:
         for x, y, group in points:
             f.write(f"{x:.2f} {y:.2f} {group}\n")
 
